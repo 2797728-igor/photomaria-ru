@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка фотографа - Управление контентом</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .admin-header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .admin-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .admin-header p {
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+        .admin-content {
+            padding: 40px;
+        }
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        .instructions {
+            background: #e8f4fd;
+            border-left-color: #3498db;
+        }
+        .upload {
+            background: #e8f6f3;
+            border-left-color: #1abc9c;
+        }
+        .edit {
+            background: #fef9e7;
+            border-left-color: #f39c12;
+        }
+        .deploy {
+            background: #f4ecf7;
+            border-left-color: #9b59b6;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .btn-success {
+            background: #27ae60;
+        }
+        .btn-success:hover {
+            background: #219a52;
+        }
+        .file-structure {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>🎨 Админка фотографа</h1>
+            <p>Управление контентом сайта Maria - профессиональный фотограф</p>
+        </div>
+        
+        <div class="admin-content">
+            <!-- Секция инструкций -->
+            <div class="section instructions">
+                <h3>📋 Как работать с админкой</h3>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Редактируйте тексты</strong> - открывайте файлы в папке content/
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Загружайте фото</strong> - копируйте в папку static/images/
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Обновляйте сайт</strong> - запускайте сборку и загружайте на хостинг
+                </div>
+            </div>
+
+            <!-- Секция редактирования -->
+            <div class="section edit">
+                <h3>✏️ Редактирование страниц</h3>
+                <p>Для редактирования текста откройте эти файлы в текстовом редакторе:</p>
+                <div class="file-structure">
+                    content/<br>
+                    ├── _index.md &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Главная страница<br>
+                    ├── services.md &nbsp;&nbsp;&nbsp;# Услуги и цены<br>
+                    ├── contact.md &nbsp;&nbsp;&nbsp;&nbsp;# Контакты<br>
+                    └── gallery/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Портфолио<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;├── _index.md<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;├── свадьбы.md<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;└── портреты.md
+                </div>
+                <button class="btn" onclick="alert('Откройте папку content/ и редактируйте файлы .md в любом текстовом редакторе (Блокнот, Notepad++)')">📝 Инструкция по редактированию</button>
+            </div>
+
+            <!-- Секция загрузки фото -->
+            <div class="section upload">
+                <h3>🖼️ Загрузка фотографий</h3>
+                <p>Для добавления фото в портфолио:</p>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Скопируйте ваши фото в папку: <code>static/images/</code>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Укажите пути к фото в файлах галереи
+                </div>
+                <div class="file-structure">
+                    static/images/<br>
+                    ├── wedding-1.jpg<br>
+                    ├── wedding-2.jpg<br>
+                    ├── portrait-1.jpg<br>
+                    └── portrait-2.jpg
+                </div>
+                <button class="btn" onclick="alert('Просто перетащите фото в папку static/images/ через Проводник Windows')">🖼️ Инструкция по загрузке фото</button>
+            </div>
+
+            <!-- Секция обновления сайта -->
+            <div class="section deploy">
+                <h3>🚀 Обновление сайта на хостинге</h3>
+                <p>После внесения изменений:</p>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Выполните в командной строке: <code>hugo --minify</code>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Загрузите папку <code>public/</code> на хостинг Beget через FileZilla
+                </div>
+                <button class="btn btn-success" onclick="alert('1. Откройте командную строку в папке сайта\n2. Введите: hugo --minify\n3. Загрузите папку public через FileZilla в /www/ на Beget')">🔄 Инструкция по обновлению</button>
+            </div>
+
+            <!-- Контакты для помощи -->
+            <div class="section" style="text-align: center; background: #e8f4fd;">
+                <h3>📞 Нужна помощь?</h3>
+                <p>Если возникли вопросы по управлению сайтом - обращайтесь!</p>
+                <p><strong>Телефон:</strong> +7 (999) 443-53-11</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Простая логика для кнопок
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

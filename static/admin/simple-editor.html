@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Редактор галерей - Photomaria</title>
+    <style>
+        body { margin: 0; font-family: Arial; background: #f5f5f5; }
+        .header { background: #2c3e50; color: white; padding: 15px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .editor { background: white; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .drop-zone { border: 2px dashed #3498db; padding: 40px; text-align: center; margin: 20px 0; border-radius: 10px; }
+        .drop-zone.dragover { background: #e3f2fd; }
+        .gallery-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 20px 0; }
+        .image-preview { position: relative; border: 1px solid #ddd; border-radius: 5px; overflow: hidden; }
+        .image-preview img { width: 100%; height: 150px; object-fit: cover; }
+        .btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn-success { background: #27ae60; }
+        .btn-danger { background: #e74c3c; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .instructions { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Редактор галерей Photomaria</h1>
+        <p>Создание альбомов для сайта на Hugo</p>
+    </div>
+    
+    <div class="container">
+        <div class="instructions">
+            <strong>💡 Как это работает:</strong>
+            <p>Редактор создаст файлы в формате Hugo. После сохранения вам нужно:</p>
+            <ol>
+                <li>Скопировать созданные файлы в папку <code>content/gallery/</code></li>
+                <li>Скопировать фото в папку <code>static/images/gallery/</code></li>
+                <li>Запустить <code>hugo --minify</code> для обновления сайта</li>
+            </ol>
+        </div>
+        
+        <div class="editor">
+            <h3>🎨 Создание новой галереи</h3>
+            
+            <div class="form-group">
+                <label>Название альбома:</label>
+                <input type="text" id="albumTitle" placeholder="Например: Свадьба Анны и Ивана">
+            </div>
+            
+            <div class="form-group">
+                <label>Описание альбома:</label>
+                <textarea id="albumDescription" rows="3" placeholder="Краткое описание фотосессии..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Дата съемки:</label>
+                <input type="date" id="albumDate">
+            </div>
+            
+            <div class="form-group">
+                <label>Категория:</label>
+                <select id="albumCategory">
+                    <option value="свадьбы">💒 Свадьбы</option>
+                    <option value="портреты">📸 Портреты</option>
+                    <option value="семейные">👨‍👩‍👧‍👦 Семейные</option>
+                    <option value="мероприятия">🎉 Мероприятия</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>🖼️ Фотографии:</label>
+                <div class="drop-zone" id="dropZone">
+                    <p>📁 Перетащите фото сюда или нажмите для выбора</p>
+                    <p style="font-size: 12px; color: #666;">Поддерживаются JPG, PNG, WebP</p>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                    <button class="btn" onclick="document.getElementById('fileInput').click()">📁 Выбрать файлы</button>
+                </div>
+            </div>
+            
+            <div id="fileCounter" style="text-align: center; margin: 10px 0; font-weight: bold;"></div>
+            
+            <div class="gallery-preview" id="galleryPreview"></div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-success" onclick="generateHugoFiles()">💾 Создать файлы для Hugo</button>
+                <button class="btn" onclick="clearForm()">🔄 Очистить форму</button>
+                <button class="btn btn-danger" onclick="window.close()">❌ Закрыть</button>
+            </div>
+            
+            <!-- Результат -->
+            <div id="result" style="display: none; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('albumDate').value = today;
+        
+        // Обработка перетаскивания файлов
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        
+        function handleFiles(files) {
+            const imageFiles = Array.from(files).filter(file => 
+                file.type.startsWith('image/')
+            );
+            
+            selectedFiles = [...selectedFiles, ...imageFiles];
+            updatePreview();
+            updateFileCounter();
+        }
+        
+        function updatePreview() {
+            const preview = document.getElementById('galleryPreview');
+            preview.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'image-preview';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <div style="padding: 5px; font-size: 12px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${file.name}</div>
+                        <button onclick="removeImage(${index})" style="position: absolute; top: 5px; right: 5px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px;">×</button>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function updateFileCounter() {
+            const counter = document.getElementById('fileCounter');
+            counter.textContent = `📸 Выбрано файлов: ${selectedFiles.length}`;
+            counter.style.color = selectedFiles.length > 0 ? '#27ae60' : '#666';
+        }
+        
+        function removeImage(index) {
+            selectedFiles.splice(index, 1);
+            updatePreview();
+            updateFileCounter();
+        }
+        
+        function clearForm() {
+            document.getElementById('albumTitle').value = '';
+            document.getElementById('albumDescription').value = '';
+            document.getElementById('albumDate').value = today;
+            document.getElementById('albumCategory').value = 'свадьбы';
+            selectedFiles = [];
+            updatePreview();
+            updateFileCounter();
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        function generateHugoFiles() {
+            const title = document.getElementById('albumTitle').value.trim();
+            const description = document.getElementById('albumDescription').value.trim();
+            const date = document.getElementById('albumDate').value;
+            const category = document.getElementById('albumCategory').value;
+            
+            // Валидация
+            if (!title) {
+                alert('Введите название альбома');
+                return;
+            }
+            
+            if (selectedFiles.length === 0) {
+                alert('Добавьте хотя бы одно фото');
+                return;
+            }
+            
+            // Создаем slug из названия
+            const slug = title.toLowerCase()
+                .replace(/[^\w\u0400-\u04FF]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            
+            // Генерируем содержимое Markdown файла
+            const markdownContent = `---
+title: "${title}"
+date: ${date}T10:00:00+03:00
+description: "${description}"
+category: "${category}"
+images:
+${selectedFiles.map((file, index) => `  - image: "/images/gallery/${slug}/${file.name}"`).join('\n')}
+---
+
+# ${title}
+
+${description}
+
+<!-- Галерея будет автоматически создана из изображений указанных выше -->
+`;
+            
+            // Показываем результат
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h3>✅ Файлы для Hugo созданы!</h3>
+                
+                <div class="instructions">
+                    <h4>📋 Что нужно сделать:</h4>
+                    <ol>
+                        <li><strong>Создайте папку:</strong> <code>static/images/gallery/${slug}/</code></li>
+                        <li><strong>Скопируйте фото</strong> в созданную папку</li>
+                        <li><strong>Создайте файл:</strong> <code>content/gallery/${slug}.md</code></li>
+                        <li><strong>Вставьте содержимое</strong> ниже в файл</li>
+                        <li><strong>Запустите:</strong> <code>hugo --minify</code></li>
+                    </ol>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <button class="btn btn-success" onclick="copyToClipboard()">📋 Скопировать Markdown</button>
+                    <button class="btn" onclick="downloadMarkdown()">📥 Скачать .md файл</button>
+                    <button class="btn" onclick="downloadFileList()">📋 Скачать список файлов</button>
+                </div>
+                
+                <h4>📄 Содержимое файла ${slug}.md:</h4>
+                <pre style="background: #2c3e50; color: white; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 12px;">${markdownContent}</pre>
+                
+                <h4>📁 Структура файлов:</h4>
+                <pre style="background: #34495e; color: white; padding: 15px; border-radius: 5px; font-size: 12px;">
+content/
+└── gallery/
+    └── <strong>${slug}.md</strong>
+
+static/images/gallery/
+└── <strong>${slug}/</strong>
+${selectedFiles.map(file => `    └── ${file.name}`).join('\n')}
+                </pre>
+            `;
+            
+            // Сохраняем данные для скачивания
+            window.currentGalleryData = {
+                slug,
+                markdownContent,
+                files: selectedFiles
+            };
+        }
+        
+        function copyToClipboard() {
+            const textArea = document.createElement('textarea');
+            textArea.value = window.currentGalleryData.markdownContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('✅ Markdown скопирован в буфер обмена!');
+        }
+        
+        function downloadMarkdown() {
+            const data = window.currentGalleryData;
+            const blob = new Blob([data.markdownContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${data.slug}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function downloadFileList() {
+            const data = window.currentGalleryData;
+            const fileList = selectedFiles.map(file => file.name).join('\n');
+            const blob = new Blob([fileList], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${data.slug}-files.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Инициализация
+        updateFileCounter();
+    </script>
+</body>
+</html>

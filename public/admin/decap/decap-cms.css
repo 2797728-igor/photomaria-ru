@@ -1,0 +1,76 @@
+/* Decap CMS Styles - Photomaria */
+.nc-githubAuthenticationPage-root,
+.nc-app-header {
+  background: #2c3e50 !important;
+  color: white !important;
+}
+
+.nc-button {
+  background: #3498db !important;
+  border: none !important;
+  border-radius: 4px !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  cursor: pointer !important;
+}
+
+.nc-button:hover {
+  background: #2980b9 !important;
+}
+
+.nc-control-input {
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  padding: 10px !important;
+  width: 100% !important;
+}
+
+.nc-control-label {
+  font-weight: bold !important;
+  margin-bottom: 5px !important;
+  display: block !important;
+}
+
+.nc-imageControl-imageUpload {
+  border: 2px dashed #3498db !important;
+  padding: 40px !important;
+  text-align: center !important;
+  border-radius: 8px !important;
+  background: #f8f9fa !important;
+}
+
+.nc-collection-container {
+  background: white !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  margin: 10px 0 !important;
+  border: 1px solid #e1e8ed !important;
+}
+
+.nc-mediaLibrary-card {
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  padding: 10px !important;
+  margin: 5px !important;
+}
+
+.nc-app-main {
+  background: #f5f5f5 !important;
+  min-height: 100vh !important;
+}
+
+/* Стили для фотографа */
+.nc-widget-object {
+  border-left: 4px solid #3498db !important;
+  background: #e3f2fd !important;
+}
+
+.nc-widget-string {
+  border-left: 4px solid #27ae60 !important;
+  background: #e8f6f3 !important;
+}
+
+.nc-widget-image {
+  border-left: 4px solid #e67e22 !important;
+  background: #fef9e7 !important;
+}

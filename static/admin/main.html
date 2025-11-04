@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка фотографа - Управление контентом</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        .admin-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .admin-header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .security-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .admin-content {
+            padding: 40px;
+        }
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+        }
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        .instructions {
+            background: #e8f4fd;
+            border-left-color: #3498db;
+        }
+        .upload {
+            background: #e8f6f3;
+            border-left-color: #1abc9c;
+        }
+        .edit {
+            background: #fef9e7;
+            border-left-color: #f39c12;
+        }
+        .deploy {
+            background: #f4ecf7;
+            border-left-color: #9b59b6;
+        }
+        .visual-editor {
+            background: #e8f6f3;
+            border-left-color: #1abc9c;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-success {
+            background: #27ae60;
+        }
+        .btn-success:hover {
+            background: #219a52;
+        }
+        .btn-danger {
+            background: #e74c3c;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .btn-website {
+            background: #9b59b6;
+        }
+        .btn-website:hover {
+            background: #8e44ad;
+        }
+        .btn-editor {
+            background: #e67e22;
+        }
+        .btn-editor:hover {
+            background: #d35400;
+        }
+        .file-structure {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .header-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .header-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .quick-action {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e1e8ed;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .quick-action:hover {
+            border-color: #3498db;
+            transform: translateY(-3px);
+        }
+        .action-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .website-preview {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .website-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .website-link:hover {
+            text-decoration: underline;
+        }
+        .feature-badge {
+            background: #e67e22;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <div class="header-buttons">
+                <a href="/" class="header-btn" target="_blank">🌐 Посмотреть сайт</a>
+                <button class="header-btn" onclick="logout()">🚪 Выйти</button>
+            </div>
+            <h1>🎨 Админка фотографа</h1>
+            <p>Управление контентом сайта Maria - профессиональный фотограф</p>
+            <div class="security-badge">🔐 Защищено Telegram</div>
+        </div>
+        
+        <div class="admin-content">
+            <!-- Предпросмотр сайта -->
+            <div class="website-preview">
+                <h3>🌐 Ваш сайт</h3>
+                <p>Посмотрите как выглядит сайт для посетителей:</p>
+                <a href="/" class="website-link" target="_blank">photomaria.ru</a>
+                <p style="margin-top: 10px; opacity: 0.8;">Откроется в новой вкладке</p>
+            </div>
+
+            <!-- Быстрые действия -->
+            <div class="quick-action" onclick="openOfflineEditor()">
+    <div class="action-icon">💾</div>
+    <h4>Оффлайн редактор</h4>
+    <p>Работа без интернета</p>
+</div>
+
+<div class="quick-action" onclick="downloadDecapCMS()">
+    <div class="action-icon">📥</div>
+    <h4>Скачать Decap CMS</h4>
+    <p>Для оффлайн работы</p>
+</div>
+            <div class="quick-action" onclick="openSimpleEditor()">
+    <div class="action-icon">📝</div>
+    <h4>Простой редактор</h4>
+    <p>Базовое управление контентом</p>
+</div>
+            <div class="quick-actions">
+                <div class="quick-action" onclick="window.open('/', '_blank')">
+                    <div class="action-icon">🌐</div>
+                    <h4>Посмотреть сайт</h4>
+                    <p>Открыть сайт в новой вкладке</p>
+                </div>
+                <div class="quick-action" onclick="openVisualEditor()">
+                    <div class="action-icon">🎛️</div>
+                    <h4>Визуальный редактор <span class="feature-badge">NEW</span></h4>
+                    <p>Редактировать как в WordPress</p>
+                </div>
+                <div class="quick-action" onclick="openDecapEditor()">
+                    <div class="action-icon">📝</div>
+                    <h4>Управление контентом</h4>
+                    <p>Создавать галереи и страницы</p>
+                </div>
+                <div class="quick-action" onclick="deploySite()">
+                    <div class="action-icon">🚀</div>
+                    <h4>Обновить сайт</h4>
+                    <p>Опубликовать изменения</p>
+                </div>
+            </div>
+
+            <!-- Секция визуального редактора -->
+            <div class="section visual-editor">
+                <h3>🎛️ Визуальный редактор (Decap CMS)</h3>
+                <p>Современный редактор для удобного управления контентом:</p>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Создание галерей</strong> - добавляйте фото перетаскиванием
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Редактирование текста</strong> - визуальный редактор как в WordPress
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Управление медиа</strong> - удобная загрузка и организация фото
+                </div>
+
+                <button class="btn btn-editor" onclick="openDecapEditor()">
+                    🎛️ Открыть редактор контента
+                </button>
+                <button class="btn" onclick="openVisualEditor()">
+                    📝 Открыть визуальный редактор
+                </button>
+                <a href="/" class="btn btn-website" target="_blank">🌐 Посмотреть сайт</a>
+            </div>
+
+            <!-- Секция инструкций -->
+            <div class="section instructions">
+                <h3>📋 Быстрый старт</h3>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Посмотрите сайт</strong> - <a href="/" target="_blank" style="color: #3498db;">откройте photomaria.ru</a> чтобы увидеть текущую версию
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Используйте визуальный редактор</strong> - для удобного редактирования
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Создавайте галереи</strong> - добавляйте фото перетаскиванием
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>Обновляйте сайт</strong> - запускайте сборку и загружайте на хостинг
+                </div>
+            </div>
+
+            <!-- Секция загрузки фото -->
+            <div class="section upload">
+                <h3>🖼️ Загрузка фотографий</h3>
+                <p>Два способа добавления фото в портфолио:</p>
+                
+                <div class="step">
+                    <span class="step-number">A</span>
+                    <strong>Через визуальный редактор</strong> (рекомендуется)<br>
+                    <em>Перетаскивайте фото прямо в браузер</em>
+                </div>
+                <div class="step">
+                    <span class="step-number">B</span>
+                    <strong>Вручную через папки</strong><br>
+                    <em>Скопируйте фото в папку: <code>static/images/uploads/</code></em>
+                </div>
+
+                <button class="btn btn-editor" onclick="openDecapEditor()">
+                    🖼️ Загрузить фото через редактор
+                </button>
+                <button class="btn" onclick="alert('Откройте папку static/images/uploads/ и перетащите туда фото через Проводник Windows')">
+                    📁 Открыть папку для загрузки
+                </button>
+                <a href="/gallery/" class="btn btn-website" target="_blank">🌐 Посмотреть галерею</a>
+            </div>
+
+            <!-- Секция обновления сайта -->
+            <div class="section deploy">
+                <h3>🚀 Обновление сайта на хостинге</h3>
+                <p>После внесения изменений:</p>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Выполните в командной строке: <code>hugo --minify</code>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Загрузите папку <code>public/</code> на хостинг Beget через FileZilla
+                </div>
+                <button class="btn btn-success" onclick="showDeployInstructions()">🔄 Инструкция по обновлению</button>
+                <button class="btn btn-danger" onclick="deploySite()">🚀 Обновить сайт сейчас</button>
+                <a href="/" class="btn btn-website" target="_blank">🌐 Проверить сайт</a>
+            </div>
+
+            <!-- Контакты для помощи -->
+            <div class="section" style="text-align: center; background: #e8f4fd;">
+                <h3>📞 Нужна помощь?</h3>
+                <p>Если возникли вопросы по управлению сайтом - обращайтесь!</p>
+                <p><strong>Телефон:</strong> +7 (999) 443-53-11</p>
+                <p><strong>Telegram:</strong> @onadrakon_blog</p>
+                <a href="/contact/" class="btn" target="_blank">📞 Страница контактов</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция выхода
+        function logout() {
+            if (confirm('Выйти из админки?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Функция обновления сайта
+        function deploySite() {
+            if (confirm('Это действие обновит сайт на хостинге. Продолжить?')) {
+                alert('Для обновления сайта выполните:\n\n1. Откройте командную строку в папке сайта\n2. Введите: hugo --minify\n3. Загрузите папку public через FileZilla в /www/ на Beget\n\nПосле этого сайт обновится через 1-2 минуты.');
+            }
+        }
+
+// Функция открытия оффлайн редактора
+function openOfflineEditor() {
+    window.open('/admin/editor-offline.html', '_blank', 'width=1400,height=900,scrollbars=yes');
+}
+
+// Функция скачивания Decap CMS
+function downloadDecapCMS() {
+    if (confirm('Скачать Decap CMS для оффлайн работы?\n\nПосле скачивания редактор будет работать без интернета.')) {
+        window.open('/admin/download-decap.html', '_blank');
+    }
+}
+        // Добавьте эту функцию в main.html
+function openSimpleEditor() {
+    window.open('/admin/simple-editor.html', '_blank', 'width=1200,height=800');
+}
+        // Функция открытия визуального редактора
+        function openVisualEditor() {
+            window.open('/admin/editor.html', '_blank', 'width=1400,height=800,scrollbars=yes');
+        }
+
+        // Функция открытия Decap CMS редактора
+        function openDecapEditor() {
+            window.open('/admin/editor.html', '_blank', 'width=1400,height=900,scrollbars=yes');
+        }
+
+        // Показать инструкции по деплою
+        function showDeployInstructions() {
+            alert('📋 ИНСТРУКЦИЯ ПО ОБНОВЛЕНИЮ САЙТА:\n\n1. ОТКРОЙТЕ КОМАНДНУЮ СТРОКУ в папке сайта\n2. ВВЕДИТЕ: hugo --minify\n3. ДОЖДИТЕСЬ завершения сборки\n4. ЗАГРУЗИТЕ папку public через FileZilla в /www/ на Beget\n5. ПОДОЖДИТЕ 1-2 минуты - сайт обновится!');
+        }
+
+        // Добавляем обработчики для кнопок
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Показываем время последнего входа
+        const loginTime = new Date().toLocaleString('ru-RU');
+        console.log('✅ Вход в админку выполнен:', loginTime);
+        
+        // Авто-открытие редактора при первом входе (опционально)
+        setTimeout(() => {
+            console.log('🎛️ Decap CMS доступен по кнопке "Визуальный редактор"');
+        }, 2000);
+    </script>
+</body>
+</html>

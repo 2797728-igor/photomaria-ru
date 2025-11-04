@@ -1,0 +1,43 @@
+<!-- Structured Data for Photographer -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Photographer",
+  "name": "Maria",
+  "description": "Профессиональный фотограф в Красноярске",
+  "url": "https://photomaria.ru",
+  "telephone": "+7-999-443-53-11",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Красноярск",
+    "addressRegion": "Красноярский край",
+    "postalCode": "660000"
+  },
+  "areaServed": ["Красноярск", "Красноярский край"],
+  "serviceType": [
+    "Свадебная фотосъемка",
+    "Портретная съемка", 
+    "Семейная фотосъемка",
+    "Съемка мероприятий"
+  ],
+  "priceRange": "руб",
+  "openingHours": "Mo-Su 09:00-21:00",
+  "sameAs": [
+    "https://www.instagram.com/onadrakon",
+    "https://vk.com/onadrakon",
+    "https://t.me/onadrakon_blog"
+  ]
+}
+</script>
+
+<!-- Geo meta tags -->
+<meta name="geo.region" content="RU-KYA" />
+<meta name="geo.placename" content="Красноярск" />
+<meta name="geo.position" content="56.015283;92.893248" />
+<meta name="ICBM" content="56.015283, 92.893248" />
+
+<!-- Яндекс верификация -->
+<meta name="yandex-verification" content="ваш_код_из_яндекс_вебмастера" />
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ .Permalink }}" />

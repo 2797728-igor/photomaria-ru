@@ -1,0 +1,28 @@
+baseURL = 'https://photomaria.ru/'
+languageCode = 'ru-ru'
+title = 'Мария - профессиональный фотограф в Красноярске'
+theme = 'ananke'
+
+[params]
+  description = "Профессиональный фотограф в Красноярске. Свадебная, портретная, семейная фотосъемка"
+  author = "Мария"
+
+[[menu.main]]
+  name = "Главная"
+  url = "/"
+  weight = 1
+
+[[menu.main]]
+  name = "Портфолио"
+  url = "/gallery/"
+  weight = 2
+
+[[menu.main]]
+  name = "Услуги"
+  url = "/services/"
+  weight = 3
+
+[[menu.main]]
+  name = "Контакты"
+  url = "/contact/"
+  weight = 4

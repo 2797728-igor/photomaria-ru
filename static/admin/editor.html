@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Визуальный редактор - Photomaria</title>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .editor-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+        }
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+    <!-- Пробуем разные CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <!-- Резервный CDN -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>🎛️ Визуальный редактор Photomaria</h1>
+        <div class="header-buttons">
+            <a href="/admin/main.html" class="btn" target="_blank">📊 Основная админка</a>
+            <a href="/" class="btn" target="_blank">🌐 Посмотреть сайт</a>
+            <button onclick="window.close()" class="btn">❌ Закрыть</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="editor-info">
+            <h3>📝 Редактор контента</h3>
+            <p>Здесь вы можете редактировать страницы и галереи в визуальном режиме.</p>
+            <p><strong>Доступные разделы:</strong> Галереи, Страницы, Услуги, Контакты</p>
+        </div>
+        
+        <!-- Контейнер для Decap CMS -->
+        <div id="cms-editor">
+            <div class="loading">
+                <p>🔄 Загрузка редактора...</p>
+                <p>Пожалуйста, подождите</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ждем полной загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Начинаем инициализацию Decap CMS...');
+            checkDecapLoaded();
+        });
+
+        function checkDecapLoaded() {
+            // Проверяем разные возможные имена библиотеки
+            if (typeof DecapCMS !== 'undefined') {
+                console.log('✅ DecapCMS найден (DecapCMS)');
+                initializeCMS();
+            } else if (typeof CMS !== 'undefined') {
+                console.log('✅ CMS найден (CMS)');
+                initializeCMS();
+            } else {
+                console.log('❌ Библиотека не найдена, пробуем через 2 секунды...');
+                setTimeout(checkDecapLoaded, 2000);
+                
+                // Если через 5 секунд не загрузилось - показываем ошибку
+                setTimeout(function() {
+                    if (typeof DecapCMS === 'undefined' && typeof CMS === 'undefined') {
+                        showError('Библиотека DecapCMS не загрузилась. Возможные причины:<br>' +
+                                 '1. Нет подключения к интернету<br>' +
+                                 '2. Блокировка CDN файрволом<br>' +
+                                 '3. Проблемы с CDN провайдером');
+                    }
+                }, 5000);
+            }
+        }
+
+        function initializeCMS() {
+            try {
+                console.log('🎯 Инициализируем Decap CMS...');
+                
+                // Конфигурация для фотографа
+                const config = {
+                    backend: {
+                        name: "test-repo"
+                    },
+                    locale: 'ru',
+                    media_folder: "static/images/uploads",
+                    public_folder: "/images/uploads",
+                    collections: [
+                        {
+                            name: "gallery",
+                            label: "📷 Галереи",
+                            folder: "content/gallery",
+                            create: true,
+                            slug: "{{slug}}",
+                            fields: [
+                                {
+                                    label: "Название альбома", 
+                                    name: "title", 
+                                    widget: "string",
+                                    required: true
+                                },
+                                {
+                                    label: "Описание", 
+                                    name: "description", 
+                                    widget: "text",
+                                    required: false
+                                },
+                                {
+                                    label: "Дата съемки", 
+                                    name: "date", 
+                                    widget: "datetime",
+                                    required: true
+                                },
+                                {
+                                    label: "Категория", 
+                                    name: "category", 
+                                    widget: "select", 
+                                    options: ["свадьбы", "портреты", "семейные", "мероприятия"],
+                                    required: true
+                                },
+                                {
+                                    label: "Обложка альбома", 
+                                    name: "cover_image", 
+                                    widget: "image",
+                                    required: false,
+                                    hint: "Главное фото для превью альбома"
+                                },
+                                {
+                                    label: "Фотографии", 
+                                    name: "images", 
+                                    widget: "list",
+                                    allow_add: true,
+                                    allow_delete: true,
+                                    field: {
+                                        label: "Фото", 
+                                        name: "image", 
+                                        widget: "image",
+                                        allow_multiple: false
+                                    },
+                                    hint: "Перетащите фото сюда или нажмите для выбора"
+                                },
+                                {
+                                    label: "Текст статьи", 
+                                    name: "body", 
+                                    widget: "markdown",
+                                    required: false,
+                                    hint: "Описание фотосессии, отзыв клиента и т.д."
+                                }
+                            ]
+                        },
+                        {
+                            name: "pages",
+                            label: "📄 Страницы", 
+                            files: [
+                                {
+                                    name: "home",
+                                    label: "🏠 Главная страница",
+                                    file: "content/_index.md",
+                                    fields: [
+                                        {
+                                            label: "Заголовок", 
+                                            name: "title", 
+                                            widget: "string",
+                                            required: true
+                                        },
+                                        {
+                                            label: "Описание", 
+                                            name: "description", 
+                                            widget: "text",
+                                            required: true
+                                        },
+                                        {
+                                            label: "Hero фото", 
+                                            name: "hero_image", 
+                                            widget: "image",
+                                            required: false,
+                                            hint: "Большое фото на главной странице"
+                                        },
+                                        {
+                                            label: "Текст страницы", 
+                                            name: "body", 
+                                            widget: "markdown",
+                                            required: true
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                // Инициализируем Decap CMS (пробуем оба варианта)
+                console.log('🚀 Запускаем Decap CMS...');
+                
+                if (typeof DecapCMS !== 'undefined') {
+                    DecapCMS.init({ config });
+                } else if (typeof CMS !== 'undefined') {
+                    CMS.init({ config });
+                }
+                
+                // Скрываем loading и показываем успех
+                setTimeout(function() {
+                    document.getElementById('cms-editor').innerHTML = `
+                        <div class="success">
+                            <h3>✅ Редактор загружен!</h3>
+                            <p>Decap CMS успешно инициализирован. Теперь вы можете:</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Создавать галереи с фото</li>
+                                <li>Редактировать страницы</li>
+                                <li>Загружать изображения перетаскиванием</li>
+                            </ul>
+                        </div>
+                    `;
+                }, 1000);
+                
+                console.log('✅ Decap CMS успешно инициализирован!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка инициализации Decap CMS:', error);
+                showError('Ошибка при запуске редактора: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('cms-editor').innerHTML = `
+                <div class="error">
+                    <h3>❌ Ошибка загрузки редактора</h3>
+                    <p>${message}</p>
+                    <div style="margin-top: 15px;">
+                        <button onclick="location.reload()" class="btn">🔄 Перезагрузить</button>
+                        <button onclick="window.close()" class="btn">❌ Закрыть</button>
+                        <button onclick="downloadDecapLocal()" class="btn">📥 Скачать локально</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadDecapLocal() {
+            alert('Чтобы использовать редактор оффлайн:\n\n1. Скачайте Decap CMS с https://github.com/decaporg/decap-cms\n2. Распакуйте в папку static/admin/decap/\n3. Подключите локальный файл вместо CDN');
+        }
+
+        // Альтернативная инициализация если основная не сработала
+        setTimeout(function() {
+            if (document.querySelector('.loading')) {
+                console.log('🕒 Пробуем альтернативную инициализацию...');
+                checkDecapLoaded();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

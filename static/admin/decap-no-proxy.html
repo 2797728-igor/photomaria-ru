@@ -1,0 +1,48 @@
+@echo off
+chcp 65001
+echo 🔧 СОЗДАНИЕ РЕДАКТОРА БЕЗ ПРОКСИ
+echo =================================
+cd /d D:\photomaria.ru
+
+(
+echo ^<!DOCTYPE html^>
+echo ^<html^>
+echo ^<head^>
+echo   ^<meta charset="utf-8" /^>
+echo   ^<meta name="viewport" content="width=device-width, initial-scale=1.0" /^>
+echo   ^<title^>Decap CMS - No Proxy^</title^>
+echo   ^<script^>
+echo     // Отключаем проверку прокси
+echo     window.CMS_ENV = 'localhost';
+echo     window.CMS_MANUAL_INIT = true;
+echo   ^</script^>
+echo   ^<script src="decap-cms.js"^>^</script^>
+echo   ^<link rel="stylesheet" href="decap-cms.css"^>
+echo ^</head^>
+echo ^<body^>
+echo   ^<div style="padding: 20px; background: #f0f0f0;"^>
+echo     ^<h2^>Decap CMS - Локальная версия^</h2^>
+echo     ^<p^>Работает без прокси сервера^</p^>
+echo   ^</div^>
+echo   ^<div id="cms-root"^>^</div^>
+echo   ^<script^>
+echo     document.addEventListener('DOMContentLoaded', function() ^{
+echo       if (typeof CMS !== 'undefined') ^{
+echo         console.log('🚀 Инициализируем Decap CMS без прокси...');
+echo         CMS.init();
+echo         console.log('✅ Decap CMS запущена!');
+echo       ^} else ^{
+echo         console.error('❌ Decap CMS не загружена');
+echo         document.getElementById('cms-root').innerHTML = 
+echo           '^<div style="padding: 20px; color: red;"^>^<h3^>Ошибка загрузки Decap CMS^</h3^>^</div^>';
+echo       ^}
+echo     ^});
+echo   ^</script^>
+echo ^</body^>
+echo ^</html^>
+) > "static\admin\decap-no-proxy.html"
+
+echo ✅ decap-no-proxy.html создан
+echo 🌐 Откройте: http://localhost:1313/admin/decap-no-proxy.html
+echo.
+pause

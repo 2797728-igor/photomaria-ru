@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Decap CMS - Photomaria</title>
+    
+    <!-- Локальные файлы -->
+    <script src="decap/decap-cms.js"></script>
+    <link href="decap/decap-cms.css" rel="stylesheet">
+    
+    <style>
+        body { margin: 0; }
+        /* Создаем контейнер для CMS */
+        #nc-root {
+            position: relative;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Контейнер, который ищет Decap CMS -->
+    <div id="nc-root"></div>
+
+    <script>
+        // Ждем полной загрузки библиотеки
+        window.addEventListener('load', function() {
+            console.log('🔄 Библиотека загружена, инициализируем CMS...');
+            
+            // Даем дополнительное время для инициализации библиотеки
+            setTimeout(initializeCMS, 500);
+        });
+
+        function initializeCMS() {
+            // Пробуем разные варианты инициализации
+            const CMS = window.DecapCMS || window.CMS;
+            
+            if (!CMS) {
+                console.error('❌ CMS библиотека не найдена');
+                showError('CMS библиотека не загрузилась');
+                return;
+            }
+
+            console.log('✅ CMS библиотека найдена:', CMS);
+            
+            try {
+                // Конфигурация для фотографа
+                const config = {
+                    backend: {
+                        name: "test-repo"
+                    },
+                    locale: 'ru',
+                    media_folder: "static/images/uploads",
+                    public_folder: "/images/uploads",
+                    collections: [
+                        {
+                            name: "gallery",
+                            label: "📷 Галереи",
+                            folder: "content/gallery",
+                            create: true,
+                            slug: "{{slug}}",
+                            fields: [
+                                {
+                                    label: "Название альбома", 
+                                    name: "title", 
+                                    widget: "string",
+                                    required: true
+                                },
+                                {
+                                    label: "Описание", 
+                                    name: "description", 
+                                    widget: "text"
+                                },
+                                {
+                                    label: "Категория", 
+                                    name: "category", 
+                                    widget: "select", 
+                                    options: [
+                                        { label: "💒 Свадьбы", value: "свадьбы" },
+                                        { label: "📸 Портреты", value: "портреты" },
+                                        { label: "👨‍👩‍👧‍👦 Семейные", value: "семейные" },
+                                        { label: "🎉 Мероприятия", value: "мероприятия" }
+                                    ]
+                                },
+                                {
+                                    label: "Фотографии", 
+                                    name: "images", 
+                                    widget: "list",
+                                    field: {
+                                        label: "Фото", 
+                                        name: "image", 
+                                        widget: "image"
+                                    }
+                                },
+                                {
+                                    label: "Текст", 
+                                    name: "body", 
+                                    widget: "markdown"
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                console.log('🚀 Запускаем инициализацию CMS...');
+                
+                // Инициализируем CMS
+                CMS.init({ config });
+                
+                console.log('✅ CMS успешно инициализирован!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка инициализации:', error);
+                showError('Ошибка: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            document.body.innerHTML = `
+                <div style="padding: 40px; text-align: center; font-family: Arial;">
+                    <h2 style="color: #e74c3c;">❌ Ошибка загрузки редактора</h2>
+                    <p>${message}</p>
+                    <div style="margin-top: 20px;">
+                        <button onclick="location.reload()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px;">
+                            🔄 Перезагрузить
+                        </button>
+                        <button onclick="window.close()" style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px;">
+                            ❌ Закрыть
+                        </button>
+                    </div>
+                    <div style="margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+                        <h3>Возможные решения:</h3>
+                        <ul>
+                            <li>Проверьте консоль браузера (F12) для подробной информации</li>
+                            <li>Убедитесь что файлы decap-cms.js и decap-cms.css в папке decap/</li>
+                            <li>Попробуйте использовать простой редактор вместо Decap CMS</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

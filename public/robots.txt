@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /search/
+
+# Яндекс
+User-agent: Yandex
+Allow: /
+Clean-param: ref&utm_source&utm_medium&utm_campaign
+
+# Главное зеркало
+Host: https://photomaria.ru
+
+Sitemap: https://photomaria.ru/sitemap.xml

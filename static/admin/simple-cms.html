@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Simple CMS</title>
+    <script src="decap/decap-cms.js"></script>
+</head>
+<body>
+    <script>
+        // Самая простая инициализация
+        setTimeout(() => {
+            if (window.DecapCMS) {
+                console.log('DecapCMS найден:', window.DecapCMS);
+                alert('DecapCMS загружен! Проверьте консоль.');
+            } else if (window.CMS) {
+                console.log('CMS найден:', window.CMS);
+                alert('CMS загружен! Проверьте консоль.');
+            } else {
+                console.log('Ничего не найдено');
+                alert('Библиотеки не найдены');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

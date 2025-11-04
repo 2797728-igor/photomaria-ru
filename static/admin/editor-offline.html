@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Decap CMS - Photomaria (Оффлайн)</title>
+    
+    <!-- Локальные файлы Decap CMS -->
+    <link href="decap/decap-cms.css" rel="stylesheet">
+    <script src="decap/decap-cms.js"></script>
+    
+    <style>
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .status {
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎛️ Decap CMS - Photomaria</h1>
+        <div class="status">🟢 Оффлайн режим</div>
+    </div>
+
+    <div id="cms-editor">
+        <div class="loading">
+            <p>🔄 Загрузка оффлайн редактора...</p>
+            <p>Используются локальные файлы</p>
+        </div>
+    </div>
+
+    <script>
+        // Ждем загрузки Decap CMS
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Инициализация оффлайн редактора...');
+            
+            // Проверяем загрузку библиотеки
+            if (typeof DecapCMS === 'undefined') {
+                showError('Локальная библиотека DecapCMS не найдена. Убедитесь, что файлы скачаны в static/admin/decap/');
+                return;
+            }
+            
+            // Даем время на загрузку
+            setTimeout(initializeOfflineCMS, 1000);
+        });
+
+        function initializeOfflineCMS() {
+            try {
+                console.log('🎯 Инициализируем оффлайн Decap CMS...');
+                
+                // Конфигурация для фотографа (оффлайн)
+                const config = {
+                    backend: {
+                        name: "test-repo"
+                    },
+                    locale: 'ru',
+                    media_folder: "static/images/uploads",
+                    public_folder: "/images/uploads",
+                    collections: [
+                        {
+                            name: "gallery",
+                            label: "📷 Галереи",
+                            folder: "content/gallery",
+                            create: true,
+                            slug: "{{slug}}",
+                            fields: [
+                                {
+                                    label: "Название альбома", 
+                                    name: "title", 
+                                    widget: "string",
+                                    required: true
+                                },
+                                {
+                                    label: "Описание", 
+                                    name: "description", 
+                                    widget: "text",
+                                    required: false
+                                },
+                                {
+                                    label: "Дата съемки", 
+                                    name: "date", 
+                                    widget: "datetime",
+                                    required: true
+                                },
+                                {
+                                    label: "Категория", 
+                                    name: "category", 
+                                    widget: "select", 
+                                    options: [
+                                        { label: "💒 Свадьбы", value: "свадьбы" },
+                                        { label: "📸 Портреты", value: "портреты" },
+                                        { label: "👨‍👩‍👧‍👦 Семейные", value: "семейные" },
+                                        { label: "🎉 Мероприятия", value: "мероприятия" }
+                                    ],
+                                    required: true
+                                },
+                                {
+                                    label: "Обложка альбома", 
+                                    name: "cover_image", 
+                                    widget: "image",
+                                    required: false,
+                                    hint: "Главное фото для превью альбома"
+                                },
+                                {
+                                    label: "Фотографии", 
+                                    name: "images", 
+                                    widget: "list",
+                                    allow_add: true,
+                                    allow_delete: true,
+                                    field: {
+                                        label: "Фото", 
+                                        name: "image", 
+                                        widget: "image",
+                                        allow_multiple: false
+                                    },
+                                    hint: "Перетащите фото сюда или нажмите для выбора"
+                                },
+                                {
+                                    label: "Текст статьи", 
+                                    name: "body", 
+                                    widget: "markdown",
+                                    required: false,
+                                    hint: "Описание фотосессии, отзыв клиента и т.д."
+                                }
+                            ]
+                        },
+                        {
+                            name: "pages",
+                            label: "📄 Страницы", 
+                            files: [
+                                {
+                                    name: "home",
+                                    label: "🏠 Главная страница",
+                                    file: "content/_index.md",
+                                    fields: [
+                                        {
+                                            label: "Заголовок", 
+                                            name: "title", 
+                                            widget: "string",
+                                            required: true
+                                        },
+                                        {
+                                            label: "Описание", 
+                                            name: "description", 
+                                            widget: "text",
+                                            required: true
+                                        },
+                                        {
+                                            label: "Hero фото", 
+                                            name: "hero_image", 
+                                            widget: "image",
+                                            required: false
+                                        },
+                                        {
+                                            label: "Текст страницы", 
+                                            name: "body", 
+                                            widget: "markdown",
+                                            required: true
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "services",
+                                    label: "💰 Услуги и цены",
+                                    file: "content/services.md",
+                                    fields: [
+                                        {
+                                            label: "Заголовок", 
+                                            name: "title", 
+                                            widget: "string",
+                                            required: true
+                                        },
+                                        {
+                                            label: "Текст", 
+                                            name: "body", 
+                                            widget: "markdown",
+                                            required: true
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "contact",
+                                    label: "📞 Контакты",
+                                    file: "content/contact.md",
+                                    fields: [
+                                        {
+                                            label: "Заголовок", 
+                                            name: "title", 
+                                            widget: "string",
+                                            required: true
+                                        },
+                                        {
+                                            label: "Телефон", 
+                                            name: "phone", 
+                                            widget: "string",
+                                            required: true
+                                        },
+                                        {
+                                            label: "Email", 
+                                            name: "email", 
+                                            widget: "string",
+                                            required: false
+                                        },
+                                        {
+                                            label: "Адрес", 
+                                            name: "address", 
+                                            widget: "text",
+                                            required: false
+                                        },
+                                        {
+                                            label: "Текст", 
+                                            name: "body", 
+                                            widget: "markdown",
+                                            required: true
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                // Инициализируем Decap CMS
+                console.log('🚀 Запускаем оффлайн Decap CMS...');
+                DecapCMS.init({ config });
+                
+                console.log('✅ Оффлайн Decap CMS успешно инициализирован!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка инициализации:', error);
+                showError('Ошибка: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('cms-editor').innerHTML = `
+                <div style="background: #e74c3c; color: white; padding: 20px; margin: 20px; border-radius: 8px; text-align: center;">
+                    <h3>❌ Ошибка загрузки оффлайн редактора</h3>
+                    <p>${message}</p>
+                    <div style="margin-top: 15px;">
+                        <button onclick="downloadDecapFiles()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px;">
+                            📥 Скачать файлы Decap CMS
+                        </button>
+                        <button onclick="window.close()" style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px;">
+                            ❌ Закрыть
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadDecapFiles() {
+            alert('Чтобы скачать файлы Decap CMS:\n\n1. Запустите файл download-decap.bat в корне проекта\n2. Или скачайте вручную:\n   - https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js\n   - https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.css\n3. Сохраните в папку static/admin/decap/');
+        }
+    </script>
+</body>
+</html>

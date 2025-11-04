@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Тест оффлайн редактора - Исправлено</title>
+    <link href="decap/decap-cms.css" rel="stylesheet">
+    <script src="decap/decap-cms.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: Arial; 
+            background: #f5f5f5;
+        }
+        .status { 
+            padding: 20px; 
+            margin: 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+        }
+        .success { background: #27ae60; color: white; }
+        .loading { background: #f39c12; color: white; }
+        .error { background: #e74c3c; color: white; }
+        
+        /* Контейнер для Decap CMS */
+        #cms-root {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Контейнер ДО загрузки скриптов -->
+    <div id="cms-root"></div>
+
+    <div id="status" class="status loading">
+        <h2>🔄 Загружаем оффлайн редактор...</h2>
+        <p>Проверяем локальные файлы Decap CMS</p>
+    </div>
+
+    <script>
+        console.log('🔍 Проверяем загружен ли Decap CMS...');
+        
+        // Ждем полной загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeEditor, 1000);
+        });
+
+        function initializeEditor() {
+            if (typeof DecapCMS === 'undefined') {
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').innerHTML = `
+                    <h2>❌ Decap CMS не загрузился</h2>
+                    <p>Библиотека не найдена</p>
+                `;
+                return;
+            }
+
+            console.log('✅ Decap CMS загружен, инициализируем...');
+            
+            try {
+                const config = {
+                    backend: {
+                        name: "test-repo"
+                    },
+                    locale: 'ru',
+                    media_folder: "static/images/uploads",
+                    public_folder: "/images/uploads",
+                    collections: [
+                        {
+                            name: "gallery",
+                            label: "📷 Галереи",
+                            folder: "content/gallery",
+                            create: true,
+                            slug: "{{slug}}",
+                            fields: [
+                                {
+                                    label: "Название альбома", 
+                                    name: "title", 
+                                    widget: "string",
+                                    required: true
+                                },
+                                {
+                                    label: "Описание", 
+                                    name: "description", 
+                                    widget: "text"
+                                },
+                                {
+                                    label: "Категория", 
+                                    name: "category", 
+                                    widget: "select", 
+                                    options: [
+                                        { label: "💒 Свадьбы", value: "свадьбы" },
+                                        { label: "📸 Портреты", value: "портреты" },
+                                        { label: "👨‍👩‍👧‍👦 Семейные", value: "семейные" },
+                                        { label: "🎉 Мероприятия", value: "мероприятия" }
+                                    ]
+                                },
+                                {
+                                    label: "Фотографии", 
+                                    name: "images", 
+                                    widget: "list",
+                                    field: {
+                                        label: "Фото", 
+                                        name: "image", 
+                                        widget: "image"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                // Инициализируем Decap CMS
+                DecapCMS.init({ config });
+                
+                document.getElementById('status').className = 'status success';
+                document.getElementById('status').innerHTML = `
+                    <h2>🎉 Оффлайн редактор работает!</h2>
+                    <p>Decap CMS успешно запущен</p>
+                    <p>Теперь вы можете создавать галереи без интернета</p>
+                `;
+                
+                console.log('✅ Decap CMS инициализирован успешно!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка инициализации:', error);
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').innerHTML = `
+                    <h2>❌ Ошибка запуска редактора</h2>
+                    <p>${error.message}</p>
+                    <p>Попробуем альтернативный метод...</p>
+                    <button onclick="tryAlternativeMethod()" style="background: white; color: #e74c3c; border: none; padding: 10px 20px; border-radius: 5px; margin: 10px; cursor: pointer;">
+                        🔄 Попробовать другой метод
+                    </button>
+                `;
+            }
+        }
+
+        function tryAlternativeMethod() {
+            // Альтернативный метод инициализации
+            if (window.CMS) {
+                console.log('🔄 Пробуем через window.CMS...');
+                window.CMS.registerBackend('test-repo', {});
+            } else {
+                alert('Альтернативные методы не сработали. Нужна отладка.');
+            }
+        }
+    </script>
+</body>
+</html>

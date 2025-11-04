@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Decap CMS - Photomaria</title>
+    
+    <!-- Локальные файлы -->
+    <script src="decap/decap-cms.js"></script>
+    <link href="decap/decap-cms.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Decap CMS автоматически создаст свой контейнер -->
+    
+    <script>
+        // Минимальная конфигурация
+        const CMS = window.CMS || window.DecapCMS;
+        
+        if (CMS) {
+            CMS.init({
+                config: {
+                    backend: {
+                        name: "test-repo"
+                    },
+                    load_config_file: false,
+                    media_folder: "static/images",
+                    public_folder: "/images",
+                    collections: [
+                        {
+                            name: "gallery",
+                            label: "Галереи",
+                            folder: "content/gallery",
+                            create: true,
+                            fields: [
+                                {label: "Title", name: "title", widget: "string"},
+                                {label: "Images", name: "images", widget: "list", field: {label: "Image", name: "image", widget: "image"}}
+                            ]
+                        }
+                    ]
+                }
+            });
+        } else {
+            document.body.innerHTML = `
+                <div style="padding: 40px; text-align: center;">
+                    <h2>❌ Decap CMS не загрузился</h2>
+                    <p>Проверьте файлы в папке decap/</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
