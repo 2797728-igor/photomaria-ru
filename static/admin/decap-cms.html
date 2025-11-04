@@ -4,222 +4,49 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Decap CMS - photomaria.ru</title>
-  
-  <!-- Подключаем Decap CMS из CDN -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f8f9fa;
-      min-height: 100vh;
-    }
-    
-    #nc-root {
-      min-height: 100vh;
-    }
-    
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      text-align: center;
-      padding: 40px;
-    }
-    
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border: 6px solid rgba(255,255,255,0.3);
-      border-top: 6px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .loading-text {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-    }
-    
-    .loading-subtext {
-      opacity: 0.8;
-      font-size: 1em;
-    }
-    
-    .error-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #f8f9fa;
-      color: #2c3e50;
-      text-align: center;
-      padding: 40px;
-    }
-    
-    .error-icon {
-      font-size: 4em;
-      margin-bottom: 20px;
-      color: #e74c3c;
-    }
-    
-    .btn {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1em;
-      margin: 10px;
-      transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    
-    .btn:hover {
-      background: #2980b9;
-      transform: translateY(-2px);
-    }
-    
-    .btn-secondary {
-      background: #95a5a6;
-    }
-    
-    .btn-secondary:hover {
-      background: #7f8c8d;
-    }
-  </style>
 </head>
 <body>
-  <!-- Контейнер для Decap CMS -->
-  <div id="nc-root">
-    <div class="loading-container" id="loading">
-      <div class="spinner"></div>
-      <div class="loading-text">🚀 Загружаем Decap CMS</div>
-      <div class="loading-subtext">photomaria.ru</div>
-    </div>
-  </div>
+  <!-- ОБЯЗАТЕЛЬНЫЙ контейнер с id="nc-root" -->
+  <div id="nc-root"></div>
   
   <script>
-    console.log("🎛️ Начало инициализации Decap CMS...");
-    
-    // Функция для инициализации Decap CMS
-    function initializeDecapCMS() {
-      console.log("🔄 Проверяем доступность CMS...");
+    // Минимальная инициализация
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 DOM загружен, инициализируем Decap CMS...');
       
-      if (typeof CMS !== "undefined" && CMS.init) {
-        console.log("✅ Decap CMS доступен, запускаем инициализацию...");
-        
-        try {
-          // Инициализируем Decap CMS
-          CMS.init();
-          console.log("✅ Decap CMS успешно инициализирован!");
-          
-          // Скрываем loading через 1 секунду
-          setTimeout(() => {
-            const loading = document.getElementById("loading");
-            if (loading) {
-              loading.style.display = "none";
-            }
-          }, 1000);
-          
-        } catch (error) {
-          console.error("❌ Ошибка при инициализации CMS:", error);
-          showError("Ошибка инициализации: " + error.message);
-        }
-        
-      } else {
-        console.warn("⚠️ Decap CMS еще не загрузился, пробуем через 1 секунду...");
-        
-        // Пробуем снова через 1 секунду
-        setTimeout(initializeDecapCMS, 1000);
-      }
-    }
-    
-    // Функция показа ошибки
-    function showError(message) {
-      console.error("❌ Показываем ошибку:", message);
-      
-      const ncRoot = document.getElementById("nc-root");
-      if (ncRoot) {
-        ncRoot.innerHTML = `
-          <div class="error-container">
-            <div class="error-icon">❌</div>
-            <h2 style="margin-bottom: 20px; color: #e74c3c;">Ошибка загрузки редактора</h2>
-            <p style="margin-bottom: 30px; max-width: 500px; line-height: 1.5;">${message}</p>
-            <div>
-              <button class="btn" onclick="window.location.reload()">🔄 Обновить страницу</button>
-              <button class="btn btn-secondary" onclick="window.close()">✖️ Закрыть</button>
-              <button class="btn" onclick="window.open('/admin/main.html', '_self')">🏠 В админку</button>
+      // Ждем немного чтобы убедиться что библиотека загрузилась
+      setTimeout(function() {
+        if (window.CMS) {
+          console.log('✅ Decap CMS найден, запускаем...');
+          try {
+            window.CMS.init();
+            console.log('✅ Decap CMS успешно инициализирован!');
+          } catch (error) {
+            console.error('❌ Ошибка инициализации:', error);
+            document.getElementById('nc-root').innerHTML = `
+              <div style="padding: 40px; text-align: center; font-family: Arial;">
+                <h2 style="color: #e74c3c;">❌ Ошибка загрузки редактора</h2>
+                <p>${error.message}</p>
+                <button onclick="window.location.reload()" style="padding: 10px 20px; margin: 10px;">
+                  🔄 Обновить страницу
+                </button>
+              </div>
+            `;
+          }
+        } else {
+          console.error('❌ Decap CMS не загрузился');
+          document.getElementById('nc-root').innerHTML = `
+            <div style="padding: 40px; text-align: center; font-family: Arial;">
+              <h2 style="color: #e74c3c;">❌ Decap CMS не загрузился</h2>
+              <p>Попробуйте обновить страницу или проверить консоль (F12)</p>
+              <button onclick="window.location.reload()" style="padding: 10px 20px; margin: 10px;">
+                🔄 Обновить страницу
+              </button>
             </div>
-            <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.7;">
-              Если проблема повторяется, проверьте:<br>
-              - Интернет-соединение<br>
-              - Блокировку скриптов в браузере<br>
-              - Консоль разработчика (F12)
-            </div>
-          </div>
-        `;
-      }
-    }
-    
-    // Функция проверки загрузки через 5 секунд
-    function checkLoadStatus() {
-      const loading = document.getElementById("loading");
-      if (loading && loading.style.display !== "none") {
-        console.warn("⚠️ Decap CMS все еще загружается через 5 секунд...");
-        
-        // Показываем дополнительную информацию
-        loading.innerHTML += `
-          <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; max-width: 400px;">
-            <strong>Долгая загрузка?</strong><br>
-            <small>Попробуйте обновить страницу или проверить консоль (F12)</small>
-          </div>
-        `;
-      }
-    }
-    
-    // Основная инициализация
-    document.addEventListener("DOMContentLoaded", function() {
-      console.log("✅ DOM загружен, начинаем инициализацию CMS...");
-      
-      // Запускаем инициализацию
-      initializeDecapCMS();
-      
-      // Проверяем статус через 5 секунд
-      setTimeout(checkLoadStatus, 5000);
-      
-      // Резервная проверка через 10 секунд
-      setTimeout(() => {
-        const loading = document.getElementById("loading");
-        if (loading && loading.style.display !== "none") {
-          console.error("❌ Decap CMS не загрузился за 10 секунд");
-          showError("Decap CMS не смог загрузиться. Проверьте подключение к интернету и консоль браузера (F12).");
+          `;
         }
-      }, 10000);
-    });
-    
-    // Дополнительная проверка при полной загрузке страницы
-    window.addEventListener("load", function() {
-      console.log("✅ Страница полностью загружена");
+      }, 100);
     });
   </script>
 </body>
