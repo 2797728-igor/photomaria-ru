@@ -5,8 +5,88 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Decap CMS - photomaria.ru</title>
   
-  <!-- Пробуем разные версии Decap CMS -->
-  <script src="https://unpkg.com/decap-cms@^2.10.0/dist/decap-cms.js"></script>
+  <!-- Пробуем 4 разных CDN -->
+  <script>
+    function loadDecapCMS() {
+      const sources = [
+        'https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js',
+        'https://cdn.jsdelivr.net/npm/decap-cms@^3.0.0/dist/decap-cms.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/decap-cms/3.9.0/decap-cms.js',
+        'https://www.unpkg.com/decap-cms@3.9.0/dist/decap-cms.js'
+      ];
+      
+      let currentSource = 0;
+      
+      function tryNextSource() {
+        if (currentSource >= sources.length) {
+          console.error('❌ Все CDN не работают');
+          showError('Не удалось загрузить Decap CMS. Все CDN недоступны.');
+          return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = sources[currentSource];
+        script.onload = function() {
+          console.log('✅ Decap CMS загружен с:', sources[currentSource]);
+          initializeCMS();
+        };
+        script.onerror = function() {
+          console.warn('❌ CDN не работает:', sources[currentSource]);
+          currentSource++;
+          tryNextSource();
+        };
+        document.head.appendChild(script);
+      }
+      
+      tryNextSource();
+    }
+    
+    function initializeCMS() {
+      if (window.CMS && typeof window.CMS.init === 'function') {
+        try {
+          console.log('🚀 Инициализируем Decap CMS...');
+          window.CMS.init();
+          console.log('✅ Decap CMS успешно запущен!');
+          document.getElementById('loading').style.display = 'none';
+        } catch (error) {
+          console.error('❌ Ошибка инициализации:', error);
+          showError('Ошибка инициализации: ' + error.message);
+        }
+      } else {
+        showError('Decap CMS загружен, но функция init не найдена');
+      }
+    }
+    
+    function showError(message) {
+      document.body.innerHTML = `
+        <div style="padding: 40px; text-align: center; font-family: Arial;">
+          <h2 style="color: #e74c3c;">❌ Ошибка загрузки Decap CMS</h2>
+          <p>${message}</p>
+          <div style="margin-top: 20px;">
+            <button onclick="window.location.reload()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; margin: 5px;">
+              🔄 Обновить страницу
+            </button>
+            <button onclick="window.location.href='/admin/simple-editor.html'" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; margin: 5px;">
+              📝 Использовать простой редактор
+            </button>
+          </div>
+          <div style="margin-top: 30px; text-align: left; max-width: 600px; margin: 30px auto;">
+            <h4>Возможные решения:</h4>
+            <ul>
+              <li>Проверьте интернет-соединение</li>
+              <li>Отключите блокировщик рекламы/скриптов</li>
+              <li>Попробуйте другой браузер</li>
+              <li>Используйте VPN</li>
+              <li>Проверьте настройки безопасности браузера</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Запускаем загрузку при готовности DOM
+    document.addEventListener('DOMContentLoaded', loadDecapCMS);
+  </script>
   
   <style>
     body {
@@ -28,10 +108,10 @@
       color: white;
     }
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(255,255,255,0.3);
-      border-top: 4px solid white;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255,255,255,0.3);
+      border-top: 5px solid white;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
@@ -40,95 +120,15 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .error {
-      padding: 40px;
-      text-align: center;
-      background: white;
-      margin: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
   </style>
 </head>
 <body>
   <div id="nc-root">
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      <div>Загружаем Decap CMS...</div>
+      <div style="font-size: 18px; margin-bottom: 10px;">Загружаем Decap CMS</div>
+      <div style="font-size: 14px; opacity: 0.8;">photomaria.ru</div>
     </div>
   </div>
-  
-  <script>
-    console.log('🚀 Начинаем загрузку Decap CMS...');
-    
-    function initCMS() {
-      console.log('🔄 Проверяем наличие CMS...');
-      
-      if (window.CMS && typeof window.CMS.init === 'function') {
-        console.log('✅ CMS найден, инициализируем...');
-        try {
-          window.CMS.init();
-          console.log('✅ Decap CMS успешно запущен!');
-          document.getElementById('loading').style.display = 'none';
-        } catch (error) {
-          console.error('❌ Ошибка инициализации:', error);
-          showError('Ошибка инициализации: ' + error.message);
-        }
-      } else {
-        console.log('❌ CMS не найден, пробуем альтернативную загрузку...');
-        loadAlternativeCMS();
-      }
-    }
-    
-    function loadAlternativeCMS() {
-      // Пробуем загрузить другую версию
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/decap-cms@2.10.0/dist/decap-cms.js';
-      script.onload = function() {
-        console.log('✅ Альтернативная версия загружена');
-        setTimeout(initCMS, 100);
-      };
-      script.onerror = function() {
-        console.error('❌ Ошибка загрузки альтернативной версии');
-        showError('Не удалось загрузить Decap CMS. Проверьте подключение к интернету.');
-      };
-      document.head.appendChild(script);
-    }
-    
-    function showError(message) {
-      document.getElementById('nc-root').innerHTML = `
-        <div class="error">
-          <h2 style="color: #e74c3c;">❌ Ошибка загрузки редактора</h2>
-          <p>${message}</p>
-          <div style="margin-top: 20px;">
-            <button onclick="window.location.reload()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; margin: 5px;">
-              🔄 Обновить страницу
-            </button>
-            <button onclick="window.location.href='/admin/main.html'" style="padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 5px; margin: 5px;">
-              🏠 Вернуться в админку
-            </button>
-          </div>
-          <div style="margin-top: 20px; font-size: 14px; color: #666;">
-            <strong>Возможные решения:</strong><br>
-            1. Проверьте интернет-соединение<br>
-            2. Отключите блокировщик рекламы<br>
-            3. Попробуйте другой браузер
-          </div>
-        </div>
-      `;
-    }
-    
-    // Запускаем инициализацию
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(initCMS, 1000);
-    });
-    
-    // Резервная проверка через 5 секунд
-    setTimeout(function() {
-      if (document.getElementById('loading').style.display !== 'none') {
-        initCMS();
-      }
-    }, 5000);
-  </script>
 </body>
 </html>
