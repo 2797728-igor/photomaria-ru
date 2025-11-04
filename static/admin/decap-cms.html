@@ -4,50 +4,131 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Decap CMS - photomaria.ru</title>
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  
+  <!-- Пробуем разные версии Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^2.10.0/dist/decap-cms.js"></script>
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+    }
+    #nc-root {
+      min-height: 100vh;
+    }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error {
+      padding: 40px;
+      text-align: center;
+      background: white;
+      margin: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
-  <!-- ОБЯЗАТЕЛЬНЫЙ контейнер с id="nc-root" -->
-  <div id="nc-root"></div>
+  <div id="nc-root">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <div>Загружаем Decap CMS...</div>
+    </div>
+  </div>
   
   <script>
-    // Минимальная инициализация
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 DOM загружен, инициализируем Decap CMS...');
+    console.log('🚀 Начинаем загрузку Decap CMS...');
+    
+    function initCMS() {
+      console.log('🔄 Проверяем наличие CMS...');
       
-      // Ждем немного чтобы убедиться что библиотека загрузилась
-      setTimeout(function() {
-        if (window.CMS) {
-          console.log('✅ Decap CMS найден, запускаем...');
-          try {
-            window.CMS.init();
-            console.log('✅ Decap CMS успешно инициализирован!');
-          } catch (error) {
-            console.error('❌ Ошибка инициализации:', error);
-            document.getElementById('nc-root').innerHTML = `
-              <div style="padding: 40px; text-align: center; font-family: Arial;">
-                <h2 style="color: #e74c3c;">❌ Ошибка загрузки редактора</h2>
-                <p>${error.message}</p>
-                <button onclick="window.location.reload()" style="padding: 10px 20px; margin: 10px;">
-                  🔄 Обновить страницу
-                </button>
-              </div>
-            `;
-          }
-        } else {
-          console.error('❌ Decap CMS не загрузился');
-          document.getElementById('nc-root').innerHTML = `
-            <div style="padding: 40px; text-align: center; font-family: Arial;">
-              <h2 style="color: #e74c3c;">❌ Decap CMS не загрузился</h2>
-              <p>Попробуйте обновить страницу или проверить консоль (F12)</p>
-              <button onclick="window.location.reload()" style="padding: 10px 20px; margin: 10px;">
-                🔄 Обновить страницу
-              </button>
-            </div>
-          `;
+      if (window.CMS && typeof window.CMS.init === 'function') {
+        console.log('✅ CMS найден, инициализируем...');
+        try {
+          window.CMS.init();
+          console.log('✅ Decap CMS успешно запущен!');
+          document.getElementById('loading').style.display = 'none';
+        } catch (error) {
+          console.error('❌ Ошибка инициализации:', error);
+          showError('Ошибка инициализации: ' + error.message);
         }
-      }, 100);
+      } else {
+        console.log('❌ CMS не найден, пробуем альтернативную загрузку...');
+        loadAlternativeCMS();
+      }
+    }
+    
+    function loadAlternativeCMS() {
+      // Пробуем загрузить другую версию
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/decap-cms@2.10.0/dist/decap-cms.js';
+      script.onload = function() {
+        console.log('✅ Альтернативная версия загружена');
+        setTimeout(initCMS, 100);
+      };
+      script.onerror = function() {
+        console.error('❌ Ошибка загрузки альтернативной версии');
+        showError('Не удалось загрузить Decap CMS. Проверьте подключение к интернету.');
+      };
+      document.head.appendChild(script);
+    }
+    
+    function showError(message) {
+      document.getElementById('nc-root').innerHTML = `
+        <div class="error">
+          <h2 style="color: #e74c3c;">❌ Ошибка загрузки редактора</h2>
+          <p>${message}</p>
+          <div style="margin-top: 20px;">
+            <button onclick="window.location.reload()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; margin: 5px;">
+              🔄 Обновить страницу
+            </button>
+            <button onclick="window.location.href='/admin/main.html'" style="padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 5px; margin: 5px;">
+              🏠 Вернуться в админку
+            </button>
+          </div>
+          <div style="margin-top: 20px; font-size: 14px; color: #666;">
+            <strong>Возможные решения:</strong><br>
+            1. Проверьте интернет-соединение<br>
+            2. Отключите блокировщик рекламы<br>
+            3. Попробуйте другой браузер
+          </div>
+        </div>
+      `;
+    }
+    
+    // Запускаем инициализацию
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initCMS, 1000);
     });
+    
+    // Резервная проверка через 5 секунд
+    setTimeout(function() {
+      if (document.getElementById('loading').style.display !== 'none') {
+        initCMS();
+      }
+    }, 5000);
   </script>
 </body>
 </html>
